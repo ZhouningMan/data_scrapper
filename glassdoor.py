@@ -54,7 +54,7 @@ def retrieveCeoHtmls():
         url = baseUrl + val
         page = s.get(url, headers=headers)
         yearlyData = {}
-        yearlyData["year"] = key
+        yearlyData["year"] = int(key)
         yearlyData["html"] = page.text
         ceoData.append(yearlyData)
     return ceoData
@@ -72,7 +72,7 @@ def extractCeoFromCeoDiv(ceoDiv):
     rank = ceoDiv.find("div", class_="cell middle rank").string
     name = ceoDiv.find("div", class_="cell middle ceo-name strong").string
     employer = ceoDiv.find("div", class_="cell middle panel-header-employer-name").string
-    return Ceo(rank, name, employer)
+    return Ceo(int(rank), name, employer)
 
 
 def dumpTopCeosToFile(topCeos):
