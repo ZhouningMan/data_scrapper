@@ -13,11 +13,12 @@ def bulkInsertTopCeoData(connection):
     with connection.cursor() as cursor:
         createTableIfNotExist = """
             CREATE TABLE IF NOT EXISTS `ceo_rating`
-                (`rank` int(11) NOT NULL,
+                (`id` int(11) NOT NULL AUTO_INCREMENT,
+                `rank` int(11) NOT NULL,
                 `name` varchar(255) COLLATE utf8_bin NOT NULL,
                 `employer` varchar(255) COLLATE utf8_bin NOT NULL,
                 `year` int(11) NOT NULL,
-                PRIMARY KEY (`rank`, `name`, `employer`, `year`)) 
+                PRIMARY KEY (`id`)) 
                 ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin
                 AUTO_INCREMENT=1
         """

@@ -2,30 +2,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 import os
-
-class Ceo:
-    def __init__(self, rank, name, employer):
-        self._rank = rank;
-        self._name = name
-        self._employer = employer
-
-    @property
-    def rank(self):
-        return self._rank
-
-    @property
-    def name(self):
-        return self._name;
-    
-    @property
-    def employer(self):
-        return self._employer
-
-class CeoEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if(isinstance(obj, Ceo)) :
-            return {"rank": obj.rank, "name": obj.name, "employer": obj.employer}
-        return json.JSONEncoder.default(self, obj)
+import data_model
 
 def processTopCeos():
     ceoData = retrieveCeoHtmls()
@@ -72,13 +49,13 @@ def extractCeoFromCeoDiv(ceoDiv):
     rank = ceoDiv.find("div", class_="cell middle rank").string
     name = ceoDiv.find("div", class_="cell middle ceo-name strong").string
     employer = ceoDiv.find("div", class_="cell middle panel-header-employer-name").string
-    return Ceo(int(rank), name, employer)
+    return data_model.Ceo(int(rank), name, employer)
 
 
 def dumpTopCeosToFile(topCeos):
     path  =  os.getcwd() + "/../data/TopCeos.json"
     with open(path, "w", encoding="utf-8") as fp:
-        json.dump(topCeos, fp, cls=CeoEncoder)
+        json.dump(topCeos, fp, cls=data_model.DataJsonEncoder)
 
 def writeToFile(fileName, text, override = False):
     if(not override and os.path.exists(fileName)):
