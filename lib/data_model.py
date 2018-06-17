@@ -109,14 +109,14 @@ class DataJsonEncoder(json.JSONEncoder):
     def default(self, obj):
             if(isinstance(obj, CeoPay)):
                 return {
+                "ceo": obj.ceo,
+                "compensation": obj.ceoComp,
+                "compchange": obj.compChange,
                 "company": obj.company, 
                 "industry": obj.industry,
                 "ticker": obj.ticker,
-                "ceo": obj.ceo,
-                "compensation": obj.ceoComp,
-                "change": obj.compChange,
                 "year": obj.year
                 }
-            if(isinstance(obj, Ceo)) :
+            elif(isinstance(obj, Ceo)) :
                 return {"rank": obj.rank, "name": obj.name, "employer": obj.employer}
             return json.JSONEncoder.default(self, obj)    

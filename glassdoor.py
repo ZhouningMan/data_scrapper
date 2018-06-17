@@ -2,7 +2,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 import os
-import data_model
+import lib.data_model as data_model
 
 def processTopCeos():
     ceoData = retrieveCeoHtmls()
@@ -56,13 +56,6 @@ def dumpTopCeosToFile(topCeos):
     path  =  os.getcwd() + "/../data/TopCeos.json"
     with open(path, "w", encoding="utf-8") as fp:
         json.dump(topCeos, fp, cls=data_model.DataJsonEncoder)
-
-def writeToFile(fileName, text, override = False):
-    if(not override and os.path.exists(fileName)):
-        return
-    with open(fileName, "w", encoding="utf-8") as f:
-        f.write(text)
-
 
 def main():
     processTopCeos()

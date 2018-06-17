@@ -1,7 +1,7 @@
-import util
+import lib.libutil as libutil
+import lib.data_model as data_model
 import os
 from bs4 import BeautifulSoup
-import data_model
 
 def processCeoCompData(html):
     compSoup = BeautifulSoup(html, 'html.parser')
@@ -10,10 +10,10 @@ def processCeoCompData(html):
     ceoCompRows.extend(compSoup.find_all("tr", class_="exec odd"))
     ceoCompRows.extend(compSoup.find_all("tr", class_="exec even"))
     for row in ceoCompRows:
-        ceosComp.append(extractCeoPayFromCeoRow(row))
+        ceosComp.append(extractCeoPayFromCeoHtmlRow(row))
     return ceosComp
 
-def extractCeoPayFromCeoRow(ceoRow):
+def extractCeoPayFromCeoHtmlRow(ceoRow):
     company = ceoRow.find("td", class_="company").find(text=True, recursive=False)
     ticker = ceoRow["co"]
     industry = ceoRow["industry"]
@@ -33,10 +33,10 @@ def targetFile():
 
 def main():
     rawData = sourceFile()
-    html = util.readTextFile(rawData)
+    html = libutil.readTextFile(rawData)
     ceosComp = processCeoCompData(html)
     destination = targetFile()
-    util.dumpToJsonFile(ceosComp, data_model.DataJsonEncoder, destination)
+    libutil.dumpToJsonFile(ceosComp, data_model.DataJsonEncoder, destination)
 
 if __name__ == "__main__":
     main()

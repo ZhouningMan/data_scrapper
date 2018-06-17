@@ -1,5 +1,6 @@
 import requests
 import json
+import os
 
 REQUEST_STATUS = "status"
 REQUEST_CONTENT = "content"
@@ -27,4 +28,8 @@ def dumpToJsonFile(data, encoder, destFile):
     with open(destFile, "w", encoding="utf-8") as fp:
         json.dump(data, fp, cls=encoder)
 
-    
+def writeToFile(fileName, text, override = False):
+    if(not override and os.path.exists(fileName)):
+        return
+    with open(fileName, "w", encoding="utf-8") as f:
+        f.write(text)
