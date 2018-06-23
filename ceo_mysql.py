@@ -3,36 +3,34 @@ import collections
 import traceback
 import json
 import os
+import lib.libmysql as libmysql
 
-DatabaseCredential = collections.namedtuple("DatabaseCredential", ["host", "port", "user", "password", "database"])
-STOCK_PICKER_DB_CREDENTIAL = DatabaseCredential("localhost", 3306, "admin", "admin321", "stock_picker")
-
-
-def bulkInsertTopCeoData(connection):
+def createCeoTable(connection):
     #create the table if not exists
-    with connection.cursor() as cursor:
-        createTableIfNotExist = """
-            CREATE TABLE IF NOT EXISTS `ceo_rating`
-                (`id` int(11) NOT NULL AUTO_INCREMENT,
-                `rank` int(11) NOT NULL,
-                `name` varchar(255) COLLATE utf8_bin NOT NULL,
-                `employer` varchar(255) COLLATE utf8_bin NOT NULL,
-                `year` int(11) NOT NULL,
-                PRIMARY KEY (`id`)) 
-                ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin
-                AUTO_INCREMENT=1
-        """
-        cursor.execute(createTableIfNotExist)
-        connection.commit()
+    createTableIfNotExist = """
+        CREATE TABLE IF NOT EXISTS `ceo_rating`
+            (`id` int(11) NOT NULL AUTO_INCREMENT,
+            `rank` int(11) NOT NULL,
+            `name` varchar(255) COLLATE utf8_bin NOT NULL,
+            `employer` varchar(255) COLLATE utf8_bin NOT NULL,
+            `year` int(11) NOT NULL,
+            PRIMARY KEY (`id`)) 
+            ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin
+            AUTO_INCREMENT=1
+    """
+    libmysql.execute(collections, createTableIfNotExist)
 
-    with connection.cursor() as cursor:
-        bulkInsertSql = """
-          INSERT INTO `ceo_rating` (`rank`, `name`, `employer`, `year`) VALUES (%s, %s, %s, %s)
-        """
-        ceoRatingRows = generateCeoRatings()
-        affected = cursor.executemany(bulkInsertSql, ceoRatingRows)
-        print("Inserted {} rows" + affected)
-        connection.commit()
+def removeCeoRatingData(connection):
+    removeCeoRatingSql = """
+        TRUNCATE `ceo_rating`
+    """
+    libmysql.execute(connection, removeCeoRatingSql)
+
+def bulkInsertTopCeoData(connection, data):
+    bulkInsertSql = """
+        INSERT INTO `ceo_rating` (`rank`, `name`, `employer`, `year`) VALUES (%s, %s, %s, %s)
+    """
+    libmysql.bulkInsert(connection, bulkInsertSql, data)
 
 def generateCeoRatings():
     path = os.getcwd() + "/../data/TopCeos.json"
@@ -49,24 +47,12 @@ def generateCeoRatings():
     return ceoRatingRows
 
 
-def bulkUpdateData():
-    connection = pymysql.connect(host=STOCK_PICKER_DB_CREDENTIAL.host,
-                                 port=STOCK_PICKER_DB_CREDENTIAL.port,
-                                 user=STOCK_PICKER_DB_CREDENTIAL.user,
-                                 password=STOCK_PICKER_DB_CREDENTIAL.password,
-                                 db=STOCK_PICKER_DB_CREDENTIAL.database,
-                                 charset='utf8mb4',
-                                 cursorclass=pymysql.cursors.DictCursor)
-    try:
-        bulkInsertTopCeoData(connection)
-    except Exception as ex:
-        print("Exception: " + str(ex))
-        traceback.print_exc()
-    finally:
-        connection.close()
-
 def main():
-    bulkUpdateData()
+    credential = libmysql.createCredential("localhost", 3306, "admin", "admin321", "stock_picker")
+    connection = libmysql.createConnection(credential)
+    removeCeoRatingData(connection)
+    data = generateCeoRatings()
+    bulkInsertTopCeoData(connection, data)
 
 if __name__ == '__main__':
     main()

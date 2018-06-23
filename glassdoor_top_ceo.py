@@ -48,8 +48,11 @@ def parseTopCeoPage(html):
 def extractCeoFromCeoDiv(ceoDiv):
     rank = ceoDiv.find("div", class_="cell middle rank").string
     name = ceoDiv.find("div", class_="cell middle ceo-name strong").string
+    nameCompoennts = name.split()
+    if(len(nameCompoennts) > 2):
+        name = "{} {}".format(nameCompoennts[0], nameCompoennts[-1])
     employer = ceoDiv.find("div", class_="cell middle panel-header-employer-name").string
-    return data_model.Ceo(int(rank), name, employer)
+    return data_model.Ceo(int(rank), name.strip(), employer.strip())
 
 
 def dumpTopCeosToFile(topCeos):

@@ -23,6 +23,12 @@ def createCeoCompTableIfNotExist(connection):
     """
     libmysql.execute(connection, createTableIfNotExist)
 
+def removeCeoCompData(connection):
+    removeCeoCompSql = """
+        TRUNCATE `ceo_compensation`
+    """
+    libmysql.execute(connection, removeCeoCompSql)
+
 def insertCeoData(connection, data):
     bulkInsertSql = """
     INSERT INTO `ceo_compensation` 
@@ -64,6 +70,7 @@ def convertCompChangeToFloat(compChange):
 def main():
     credential = libmysql.createCredential("localhost", 3306, "admin", "admin321", "stock_picker")
     connection = libmysql.createConnection(credential)
+    removeCeoCompData(connection)
     data = loadCeoCompensationData()
     insertCeoData(connection, data)
 
