@@ -9,6 +9,7 @@ def processTopCeos():
     topCeos = []
     for yearlyData in ceoData:
         yearlyTopCeos = {}
+        yearlyTopCeos["size"] = yearlyData["size"]
         yearlyTopCeos["year"] = yearlyData["year"]
         yearlyTopCeos["ceos"] = parseTopCeoPage(yearlyData["html"])
         topCeos.append(yearlyTopCeos)
@@ -16,22 +17,28 @@ def processTopCeos():
 
 def retrieveCeoHtmls():
     baseUrl = "https://www.glassdoor.com/"
-    urls = {
-        "2017":"Award/Top-CEOs-LST_KQ0,8.htm",
-        "2016": "Award/Highest-Rated-CEOs-2016-LST_KQ0,23.htm",
-        "2015": "Award/Highest-Rated-CEOs-2015-LST_KQ0,23.htm",
-        "2014": "Award/Highest-Rated-CEOs-2014-LST_KQ0,23.htm",
-        "2013" :"Award/50-Highest-Rated-CEOs-2013-LST_KQ0,26.htm"
-    }
+    ceoLinks = [
+        (2018, "Large", "Award/Top-CEOs-LST_KQ0,8.htm"),
+        (2017, "Large", "Award/Highest-Rated-CEOs-2017-LST_KQ0,23.htm"),
+        (2016, "Large", "Award/Highest-Rated-CEOs-2016-LST_KQ0,23.htm"),
+        (2015, "Large", "Award/Highest-Rated-CEOs-2015-LST_KQ0,23.htm"),
+        (2014, "Large", "Award/Highest-Rated-CEOs-2014-LST_KQ0,23.htm"),
+        (2018, "Small_Medium", "Award/Top-CEOs-at-SMBs-LST_KQ0,16.htm"),
+        (2017, "Small_Medium", "Award/Highest-Rated-CEOs-at-SMBs-2017-LST_KQ0,31.htm"),
+        (2016, "Small_Medium", "Award/Highest-Rated-CEOs-at-SMBs-2016-LST_KQ0,31.htm"),
+        (2015, "Small_Medium", "Award/Highest-Rated-CEOs-at-SMBs-2015-LST_KQ0,31.htm"),
+        (2014, "Small_Medium", "Award/Highest-Rated-CEOs-at-SMBs-2014-LST_KQ0,31.htm")
+    ]
     
     headers = {'user-agent': 'my-app/0.0.1'}
     ceoData = []
     s = requests.Session()
-    for key, val in urls.items():
-        url = baseUrl + val
+    for year, size, link in ceoLinks:
+        url = baseUrl + link
         page = s.get(url, headers=headers)
         yearlyData = {}
-        yearlyData["year"] = int(key)
+        yearlyData["size"] = size
+        yearlyData["year"] = year
         yearlyData["html"] = page.text
         ceoData.append(yearlyData)
     return ceoData
