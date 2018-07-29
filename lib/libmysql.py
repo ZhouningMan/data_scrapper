@@ -22,7 +22,13 @@ def execute(connection, sql):
         connection.commit()
 
 def bulkInsert(connection, sql, data):
+    """
+    data must be in the form of tuples (col1, col2, ...)
+    """
     with connection.cursor() as cursor:
         affected = cursor.executemany(sql, data)
         print("Inserted {} rows", affected)
         connection.commit()
+        
+DEFAULT_CREDENTIAL = DatabaseCredential("localhost", 3306, "admin", "admin321", "stock_picker")
+DEFAULT_CONNECTION = createConnection(DEFAULT_CREDENTIAL)
